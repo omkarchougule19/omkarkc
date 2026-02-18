@@ -1,14 +1,29 @@
 import { useState } from "react";
 import { Mail, Linkedin, Github, Phone } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import { toast } from "sonner";
 
 const ContactSection = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // placeholder
-    alert("Thank you for reaching out! I'll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+    setSending(true);
+    try {
+      await emailjs.send(
+        "service_x5854zo",
+        "template_iyx5i3x",
+        { from_name: form.name, from_email: form.email, message: form.message },
+        "Sp4gmWG-c3vwaOpTZ"
+      );
+      toast.success("Message sent! I'll get back to you soon.");
+      setForm({ name: "", email: "", message: "" });
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -69,9 +84,10 @@ const ContactSection = () => {
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+              disabled={sending}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              Send Message
+              {sending ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
